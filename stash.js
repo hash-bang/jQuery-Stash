@@ -30,6 +30,7 @@ function stashinit() {
 			},
 			*/
 			none: { // Generic fallback handler
+				name: 'none',
 				type: 'text',
 				pull: function(code) {
 					console.warn('$.stash - WARNING: I dont know how to refresh a stash object that has no registered handler');
@@ -57,6 +58,7 @@ function stashinit() {
 						console.warn('$.stash - WARNING: Unrecognised handler type: ' + handler.type);
 				}
 			}
+			handler['name'] = name;
 			$.stash.handlers[name] = handler;
 		},
 
@@ -65,11 +67,14 @@ function stashinit() {
 		* @param string code The incomming code that should be used to determine the handler to use
 		*/
 		getHandler: function(code) {
+			var usekey = 'none';
 			$.each($.stash.handlers, function(key, handler) {
-				if (handler.re && code.match(handler.re))
-					return handler;
+				if (handler.re && code.match(handler.re)) {
+					usekey = key;
+					return false;
+				}
 			});
-			return $.stash.handlers['none']; // Revert to fallback if none are found
+			return $.stash.handlers[usekey];
 		},
 
 		/**
@@ -83,7 +88,7 @@ function stashinit() {
 			var handler = $.stash.getHandler(code);
 			var value = data;
 			if (handler.encoder)
-				value = handler.encoder(code, data);
+				value = handler.encoder(code, value);
 
 			localStorage.setItem(code, value);
 		},
@@ -111,6 +116,7 @@ function stashinit() {
 				)
 			) { // Failed to retrieve the value - maybe do a pull instead?
 				if (handler.pull) { // The handler knows how to pull
+					console.log('$.stash.get(' + code + ') - pull!');
 					handerl.pull(code, function(value) { // Define success behaviour
 						$.stash.set(code, value); // Store for future use
 						success(code, value);

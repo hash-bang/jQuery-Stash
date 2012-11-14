@@ -47,7 +47,7 @@ function stashinit() {
 						handler['encoder'] = function(code,data) {
 							return JSON.stringify(data);
 						};
-						hander['decoder'] = function(code,data) {
+						handler['decoder'] = function(code,data) {
 							return JSON.parse(data);
 						};
 						break;
@@ -64,10 +64,11 @@ function stashinit() {
 		*/
 		getHandler: function(code) {
 			$.each($.stash.handlers, function(key, handler) {
-				if (handler['re'].match(code))
+				console.log(handler);
+				if (handler.re && handler.re.match(code))
 					return handler;
 			});
-			return $.stash.handler['none']; // Revert to fallback if none are found
+			return $.stash.handlers['none']; // Revert to fallback if none are found
 		},
 
 		/**

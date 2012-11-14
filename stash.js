@@ -3,6 +3,8 @@
 * This object tries to store data using localStorage and/or retrieve it from an AJAX request if its not already there
 */
 function stashinit() {
+	if ($.stash) // Already loaded?
+		return;
 	console.log('Stash load');
 	$.extend({stash: {
 		/**
@@ -64,8 +66,7 @@ function stashinit() {
 		*/
 		getHandler: function(code) {
 			$.each($.stash.handlers, function(key, handler) {
-				console.log(handler);
-				if (handler.re && handler.re.match(code))
+				if (handler.re && code.match(handler.re))
 					return handler;
 			});
 			return $.stash.handlers['none']; // Revert to fallback if none are found

@@ -27,7 +27,7 @@ $(document() {
 			},
 			*/
 			none: { // Generic fallback handler
-				type: 'text'
+				type: 'text',
 				pull: function(code) {
 					console.warn('$.stash - WARNING: I dont know how to refresh a stash object that has no registered handler');
 				}
@@ -39,7 +39,7 @@ $(document() {
 		* @param string The short name of the handler used for internally refering to the handler
 		* @param object The handler object. See handlers for examples of what it could contain
 		*/
-		defineHandler(name, handler) {
+		defineHandler: function(name, handler) {
 			if (handler.type) { // Use a predefined type to specify common settings
 				switch (handler.type) {
 					case 'json':
@@ -107,7 +107,7 @@ $(document() {
 					value[handler.expirykey] > $.stash.epoc() - $.stash.expiry // The data has expired
 				)
 			) { // Failed to retrieve the value - maybe do a pull instead?
-				if (handler.pull) // The handler knows how to pull
+				if (handler.pull) { // The handler knows how to pull
 					handerl.pull(code, function(value) { // Define success behaviour
 						$.stash.set(code, value); // Store for future use
 						success(code, value);
@@ -120,7 +120,6 @@ $(document() {
 			}
 
 			// If we got to here then everything was a success
-
 			success(code, value);
 		},
 
@@ -131,5 +130,6 @@ $(document() {
 		epoc: function() {
 			return Math.round((new Date()).getTime() / 1000);
 		}
-	});
-});
+	}});
+}
+$(stashinit); // Run the init function

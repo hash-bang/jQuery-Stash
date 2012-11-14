@@ -60,6 +60,7 @@ function stashinit() {
 			}
 			handler['name'] = name;
 			$.stash.handlers[name] = handler;
+			return this;
 		},
 
 		/**
@@ -91,6 +92,7 @@ function stashinit() {
 				value = handler.encoder(code, value);
 
 			localStorage.setItem(code, value);
+			return this;
 		},
 
 		/**

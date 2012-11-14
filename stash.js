@@ -2,8 +2,9 @@
 * Matts little data retriever / storage engine
 * This object tries to store data using localStorage and/or retrieve it from an AJAX request if its not already there
 */
-$(document() {
-	$.extend(stash: {
+function stashinit() {
+	console.log('Stash load');
+	$.extend({stash: {
 		/**
 		* The default expiry range
 		* If data is older than the current time minus this value its deemed to have expired

@@ -15,6 +15,13 @@ function stashinit() {
 		expiry: 60*60*24*2, // Default: 2 days
 
 		/**
+		* Treat all data as expired
+		* This in effect forces a pull reguardless of whether the data is actually in the cache or not
+		* @var bool
+		*/
+		forcepull: 0,
+
+		/**
 		* An array of data type handlers
 		* @var hash
 		*/
@@ -110,6 +117,7 @@ function stashinit() {
 				value = handler.decoder(code, value);
 
 			if (
+				($.stash.forcepull && handler.pull) || // Force the pulling of all data (but only if we know how to pull) OR
 				!value || // No value could be retrieved OR
 				( // Has it expired...
 					handler.expirykey && // The handler has an expiry key defined
@@ -119,7 +127,7 @@ function stashinit() {
 			) { // Failed to retrieve the value - maybe do a pull instead?
 				if (handler.pull) { // The handler knows how to pull
 					console.log('$.stash.get(' + code + ') - pull!');
-					handerl.pull(code, function(value) { // Define success behaviour
+					handler.pull(code, function(value) { // Define success behaviour
 						$.stash.set(code, value); // Store for future use
 						success(code, value);
 					}, function() { // Define fail behaviour

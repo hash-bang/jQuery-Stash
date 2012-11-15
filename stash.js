@@ -8,11 +8,12 @@ function stashinit() {
 	console.log('Stash load');
 	$.extend({stash: {
 		/**
-		* The default expiry range
-		* If data is older than the current time minus this value its deemed to have expired
-		* @var int
+		* Default properties to be used when creating a handler
+		* @var hash
 		*/
-		expiry: 60*60*24*2, // Default: 2 days
+		defaultHandler: {
+			expires: 60*60*24*2, // Default: 2 days
+		},
 
 		/**
 		* Treat all data as expired
@@ -30,6 +31,7 @@ function stashinit() {
 			example: {
 				re: /^@/, // Anything beginning with '@'
 				type: 'json', // ... is a JSON object (and should be converted to string when storing for example)
+				expires: 60*60*24, // How many seconds until the data expires - default is inherited from $.stash.defaultHandler.expires. Set to '0' for never expires
 				expirykey: 'age', // Look for a subkey called 'age' to determine the expiry point
 				encoder: function(code, data) {}, // An encoder to use if 'type' isnt already set to something useful
 				decoder: function(code, data) {}, // A decoder to use if 'type' isn't already set to something useful
@@ -47,10 +49,12 @@ function stashinit() {
 
 		/**
 		* Define a new handler object
+		* Note that the defaultHandler array is merged with the user properties so see it for defaults unless overridden here
 		* @param string The short name of the handler used for internally refering to the handler
 		* @param object The handler object. See handlers for examples of what it could contain
 		*/
 		defineHandler: function(name, handler) {
+			handler = $.extend({}, $.stash.defaultHandler, handler);
 			if (handler.type) { // Use a predefined type to specify common settings
 				switch (handler.type) {
 					case 'json':
@@ -120,9 +124,10 @@ function stashinit() {
 				($.stash.forcepull && handler.pull) || // Force the pulling of all data (but only if we know how to pull) OR
 				!value || // No value could be retrieved OR
 				( // Has it expired...
+					handler.expires && // An expiry limit is specified
 					handler.expirykey && // The handler has an expiry key defined
 					value.expirykey && // The retrieved data has the expiry key
-					value[handler.expirykey] > $.stash.epoc() - $.stash.expiry // The data has expired
+					value[handler.expirykey] > $.stash.epoc() - handler.expires // The data has expired
 				)
 			) { // Failed to retrieve the value - maybe do a pull instead?
 				if (handler.pull) { // The handler knows how to pull

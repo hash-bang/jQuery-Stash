@@ -134,9 +134,9 @@ function stashinit() {
 					console.log('$.stash.get(' + code + ') - pull!');
 					handler.pull(code, function(value) { // Define success behaviour
 						$.stash.set(code, value); // Store for future use
-						success(code, value);
+						success(value, code);
 					}, function() { // Define fail behaviour
-						fail(code);
+						fail('Failed to pull', code);
 					});
 				} else { // Handler can't pull - just fail
 					fail(code);

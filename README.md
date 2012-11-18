@@ -33,7 +33,7 @@ Somewhere deep inside your initializer:
 
 From now on you can just pull a profile with:
 
-	$.stash.get('@joe', function(code, profile) {
+	$.stash.get('@joe', function(profile) {
 		alert('Hello ' + profile.name + '!');
 	}, function() {
 		alert('Something went horribly wrong!');

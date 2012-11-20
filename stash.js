@@ -144,7 +144,7 @@ function stashinit() {
 			}
 
 			// If we got to here then everything was a success
-			success(code, value);
+			success(value, code);
 		},
 
 		/**

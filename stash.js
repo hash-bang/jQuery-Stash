@@ -41,6 +41,7 @@ function stashinit() {
 				expirykey: 'age', // Look for a subkey called 'age' to determine the expiry point
 				encoder: function(code, data) {}, // An encoder to use if 'type' isnt already set to something useful
 				decoder: function(code, data) {}, // A decoder to use if 'type' isn't already set to something useful
+				allowundefined: 0, // Whether to allow 'undefined' as a valid result. If boolean false an 'undefined' is returned the pull function fails
 				pull: function(code, callback_success, callback_fail) {} // How to pull new data from the server - this is the callback thats used if Stash doesnt know of the object OR it has expired. If the pull was successful the pull function should call callback_success(value) otherwise it should call callback_fail()
 			},
 			*/
@@ -161,6 +162,13 @@ function stashinit() {
 						console.warn('Stash - $.stash.get(' + code + ') - ERROR NO PULL METHOD!');
 					fail(code);
 				}
+			}
+
+			if (!handler.allowundefined && typeof value == 'undefined') {
+				if (this.debug)
+					console.warn('Stash - $.stash.get(' + code + ') - RETURNED UNDEFINED!');
+				fail(code);
+				return;
 			}
 
 			// If we got to here then everything was a success

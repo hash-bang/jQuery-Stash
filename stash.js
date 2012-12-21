@@ -162,17 +162,17 @@ function stashinit() {
 						console.warn('Stash - $.stash.get(' + code + ') - ERROR NO PULL METHOD!');
 					fail(code);
 				}
-			}
+			} else { // We dont need to pull the value - use the value we already have
+				if (!handler.allowundefined && typeof value == 'undefined') {
+					if (this.debug)
+						console.warn('Stash - $.stash.get(' + code + ') - RETURNED UNDEFINED!');
+					fail(code);
+					return;
+				}
 
-			if (!handler.allowundefined && typeof value == 'undefined') {
-				if (this.debug)
-					console.warn('Stash - $.stash.get(' + code + ') - RETURNED UNDEFINED!');
-				fail(code);
-				return;
+				// If we got to here then everything was a success
+				success(value, code);
 			}
-
-			// If we got to here then everything was a success
-			success(value, code);
 		},
 
 		/**

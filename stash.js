@@ -68,7 +68,13 @@ function stashinit() {
 							return JSON.stringify(data);
 						};
 						handler['decoder'] = function(code,data) {
-							return JSON.parse(data);
+							var decoded;
+							try {
+								decoded = JSON.parse(data);
+							} catch(e) {
+								console.warn('Stash - WARNING: Invalid JSON "' + data + '"');
+							}
+
 						};
 						break;
 					default:

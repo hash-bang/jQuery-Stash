@@ -16,11 +16,17 @@ function stashinit() {
 		},
 
 		/**
+		* Log debug messages to console
+		* @var bool
+		*/
+		debug: 0,
+
+		/**
 		* Treat all data as expired
 		* This in effect forces a pull reguardless of whether the data is actually in the cache or not
 		* @var bool
 		*/
-		forcepull: 0,
+		force: 0,
 
 		/**
 		* An array of data type handlers
@@ -42,7 +48,7 @@ function stashinit() {
 				name: 'none',
 				type: 'text',
 				pull: function(code) {
-					console.warn('$.stash - WARNING: I dont know how to refresh a stash object that has no registered handler');
+					console.warn('Stash - WARNING: I dont know how to refresh the stash object using the code "' + code + '" that has no registered handler');
 				}
 			}
 		},
@@ -66,9 +72,11 @@ function stashinit() {
 						};
 						break;
 					default:
-						console.warn('$.stash - WARNING: Unrecognised handler type: ' + handler.type);
+						console.warn('Stash - WARNING: Unrecognised handler type: ' + handler.type);
 				}
 			}
+			if (this.debug)
+				console.log('Stash - Registered handler "' + name + '"');
 			handler['name'] = name;
 			$.stash.handlers[name] = handler;
 			return this;
@@ -95,7 +103,8 @@ function stashinit() {
 		* @param mixed data The data object to store, indexed by 'code'
 		*/
 		set: function(code, data) {
-			console.log('$.stash.set(' + code + ',...)');
+			if (this.debug)
+				console.log('Stash - $.stash.set(' + code + ',...)');
 
 			var handler = $.stash.getHandler(code);
 			var value = data;
@@ -121,7 +130,7 @@ function stashinit() {
 				value = handler.decoder(code, value);
 
 			if (
-				($.stash.forcepull && handler.pull) || // Force the pulling of all data (but only if we know how to pull) OR
+				($.stash.force && handler.pull) || // Force the pulling of all data (but only if we know how to pull) OR
 				!value || // No value could be retrieved OR
 				( // Has it expired...
 					handler.expires && // An expiry limit is specified
@@ -131,14 +140,19 @@ function stashinit() {
 				)
 			) { // Failed to retrieve the value - maybe do a pull instead?
 				if (handler.pull) { // The handler knows how to pull
-					console.log('$.stash.get(' + code + ') - pull!');
+					if (this.debug)
+						console.log('Stash - $.stash.get(' + code + ') - PULL!');
 					handler.pull(code, function(value) { // Define success behaviour
 						$.stash.set(code, value); // Store for future use
 						success(value, code);
 					}, function() { // Define fail behaviour
+						if (this.debug)
+							console.warn('Stash - $.stash.get(' + code + ') - ERROR DURING PULL!');
 						fail('Failed to pull', code);
 					});
 				} else { // Handler can't pull - just fail
+					if (this.debug)
+						console.warn('Stash - $.stash.get(' + code + ') - ERROR NO PULL METHOD!');
 					fail(code);
 				}
 			}
